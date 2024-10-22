@@ -5,9 +5,15 @@ using UnityEngine;
 
 namespace Configs
 {
-    [CreateAssetMenu(menuName = "Configs/GameSettingsData")]
-    public class GameSettingsData : ScriptableObject
+    [CreateAssetMenu(menuName = "Configs/AbilitySettingsData")]
+    public class AbilitySettingsData : ScriptableObject
     {
+        [Serializable]
+        public class Ability
+        {
+            [SerializeField] private AbilityTypes _type;
+        }
+
         [SerializeField] private int maxHp;
         [SerializeField] private AbilityTypes[] availableAbilities = Array.Empty<AbilityTypes>();
 

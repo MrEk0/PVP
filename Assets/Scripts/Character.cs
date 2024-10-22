@@ -1,14 +1,20 @@
+using System;
 using Common;
 using Configs;
 using Interfaces;
 
-public class Character : IDamagable
+public abstract class Character : IDamagable
 {
+    protected ServiceLocator _serviceLocator;
+    
     private CharacterHp _hp;
     private CharacterAbilities _abilities;
-    
-    public Character(GameSettingsData data)
+
+    protected Character(ServiceLocator serviceLocator)
     {
+        _serviceLocator = serviceLocator;
+        var data = serviceLocator.GetService<GameSettingsData>();
+        
         _hp = new CharacterHp(data.MaxHp);
         _abilities = new CharacterAbilities();
     }
@@ -22,4 +28,6 @@ public class Character : IDamagable
     {
         _hp.Heal(extraHp);
     }
+
+    public abstract void Step();
 }

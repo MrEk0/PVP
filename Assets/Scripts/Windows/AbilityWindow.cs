@@ -1,39 +1,61 @@
+using System;
 using Windows;
 using Common;
 using Configs;
+using Enums;
 using Factories;
 using UnityEngine;
 
-public class AbilityWindow : AWindow
+namespace Windows
 {
-    [SerializeField] private RectTransform _abilityPanel;
-    [SerializeField] private AbilityPoolFactory _abilityPoolFactory;
-
-    private ServiceLocator _serviceLocator;
-    private PlayerCharacter _player;
-
-    public override void Init(ServiceLocator serviceLocator)
+    public class AbilityWindow : AWindow
     {
-        _serviceLocator = serviceLocator;
-        _player = serviceLocator.GetService<PlayerCharacter>();
+        public event Action<AbilityTypes> AbilitySelectEvent = delegate { };
 
-        _player.StepStartEvent += OnPlayerStepStarted;
-    }
+        [SerializeField] private RectTransform _abilityPanel;
+        [SerializeField] private AbilityPoolFactory _abilityPoolFactory;
 
-    private void OnPlayerStepStarted()
-    {
-        _abilityPanel.gameObject.SetActive(true);
+        private ServiceLocator _serviceLocator;
+        private PlayerCharacter _player;
 
-        var data = _serviceLocator.GetService<GameSettingsData>();
-        foreach (var availableAbility in data.AvailableAbilities)
+        public override void Init(ServiceLocator serviceLocator)
         {
-            var abilityWindowItem = _abilityPoolFactory.ObjectPool.Get();
+            _serviceLocator = serviceLocator;
+            _player = serviceLocator.GetService<PlayerCharacter>();
 
-            var windowItemData = new AbilityWindowItemData
+            _player.StepStartEvent += OnPlayerStepStarted;
+            _abilityPoolFactory.AbilitySelectEvent += OnAbilitySelected;
+        }
+
+        private void OnDestroy()
+        {
+            _player.StepStartEvent -= OnPlayerStepStarted;
+            _abilityPoolFactory.AbilitySelectEvent -= OnAbilitySelected;
+        }
+
+        private void OnPlayerStepStarted()
+        {
+            _abilityPanel.gameObject.SetActive(true);
+            
+            foreach (var availableAbility in _player.CharacterAbilities.AbilitiesData)
             {
+                var abilityWindowItem = _abilityPoolFactory.ObjectPool.Get();
 
-            };
-            abilityWindowItem.Init(windowItemData);
+                var windowItemData = new AbilityWindowItemData
+                {
+                    Sprite = availableAbility.Sprite,
+                    ReloadSteps = availableAbility.CurrentReloadSteps,
+                    Type = availableAbility.Type
+                };
+                abilityWindowItem.Init(windowItemData);
+            }
+        }
+
+        private void OnAbilitySelected(AbilityTypes type)
+        {
+            _abilityPanel.gameObject.SetActive(false);
+            
+            AbilitySelectEvent(type);
         }
     }
 }

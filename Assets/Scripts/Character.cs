@@ -1,4 +1,3 @@
-using System;
 using Common;
 using Configs;
 using Interfaces;
@@ -8,7 +7,8 @@ public abstract class Character : IDamagable
     protected ServiceLocator _serviceLocator;
     
     private CharacterHp _hp;
-    private CharacterAbilities _abilities;
+
+    public CharacterAbilities CharacterAbilities { get; }
 
     protected Character(ServiceLocator serviceLocator)
     {
@@ -16,7 +16,7 @@ public abstract class Character : IDamagable
         var data = serviceLocator.GetService<GameSettingsData>();
         
         _hp = new CharacterHp(data.MaxHp);
-        _abilities = new CharacterAbilities();
+        CharacterAbilities = new CharacterAbilities();
     }
 
     public void TakeDamage(float damageValue)

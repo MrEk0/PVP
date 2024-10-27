@@ -20,10 +20,10 @@ namespace Windows
         public override void Init(AbilityWindowItemData data)
         {
             _abilityImage.sprite = data.Sprite;
-            _reloadText.text = data.ReloadCount.ToString();
+            _reloadText.text = data.ReloadSteps.ToString();
             _type = data.Type;
 
-            _blockImage.gameObject.SetActive(data.ReloadCount > 0);
+            _blockImage.gameObject.SetActive(data.ReloadSteps > 0);
         }
 
         private void OnEnable()

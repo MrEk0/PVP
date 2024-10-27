@@ -1,39 +1,75 @@
-using System;
-using System.Collections.Generic;
+using System.Linq;
+using Windows;
+using Abilities;
 using Common;
 using Configs;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameSettingsData gameSettingsData;
+    [SerializeField] private GameSettingsData _gameSettingsData;
+    [SerializeField] private GameWindow _gameWindow;
 
-    private readonly List<Character> _characters = new();
-    private int currentIndex = 0;
+    private PlayerCharacter _playerCharacter;
+    private EnemyCharacter _enemyCharacter;
+
+    private bool _isPlayerStep = true;
 
     private void Start()
     {
         var serviceLocator = new ServiceLocator();
+
+        var abilitiesData = _gameSettingsData.AvailableAbilities.Select(ability =>
+            new CharacterAbilities.AbilityData<Ability>
+            {
+                Ability = ability.Ability,
+                Sprite = ability.Sprite,
+                CurrentReloadSteps = 0,
+                MaxReloadSteps = ability.ReloadStepsCount,
+                Type = ability.Type
+            }).ToList();
+
+        _playerCharacter = new PlayerCharacter(serviceLocator);
+        _playerCharacter.CharacterAbilities.AddRange(abilitiesData);
+        _playerCharacter.StepCompleteEvent += OnStepCompletedEvent;
+
+        _enemyCharacter = new EnemyCharacter(serviceLocator);
+        _enemyCharacter.CharacterAbilities.AddRange(abilitiesData);
+        _enemyCharacter.StepCompleteEvent += OnStepCompletedEvent;
+
+        _gameWindow.RestartEvent += OnGameRestarted;
+
+        MakeFirstStep();
+    }
+
+    private void OnDestroy()
+    {
+        _playerCharacter.StepCompleteEvent -= OnStepCompletedEvent;
+        _enemyCharacter.StepCompleteEvent -= OnStepCompletedEvent;
+        _gameWindow.RestartEvent -= OnGameRestarted;
+    }
+
+    private void MakeFirstStep()
+    {
+        _playerCharacter.Step();
+        _isPlayerStep = false;
+    }
+
+    private void OnGameRestarted()
+    {
+        _playerCharacter.CharacterAbilities.Restart();
+        _enemyCharacter.CharacterAbilities.Restart();
         
-        var player = new PlayerCharacter(serviceLocator);
-        player.StepCompleteEvent += OnStepCompletedEvent;
-        _characters.Add(player);
-        
-        var enemy = new EnemyCharacter(serviceLocator);
-        enemy.StepCompleteEvent += OnStepCompletedEvent;
-        _characters.Add(enemy);
-        
-        _characters[currentIndex].Step();
+        MakeFirstStep();
     }
 
     private void OnStepCompletedEvent()
     {
-        currentIndex++;
-        
-        for (var i = 0; i < _characters.Count; i++)
-        {
-            if (i == currentIndex)
-                _characters[i].Step();
-        }
+        if (_isPlayerStep)
+            _playerCharacter.Step();
+        else
+            _enemyCharacter.Step();
+
+        _isPlayerStep = !_isPlayerStep;
     }
 }

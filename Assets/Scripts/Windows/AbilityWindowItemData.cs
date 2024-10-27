@@ -6,7 +6,7 @@ namespace Windows
     public class AbilityWindowItemData : AWindowItemData
     {
         public Sprite Sprite;
-        public int ReloadCount;
+        public int ReloadSteps;
         public AbilityTypes Type;
     }
 }

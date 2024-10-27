@@ -2,24 +2,27 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameWindow : MonoBehaviour
+namespace Windows
 {
-    public event Action RestartEvent = delegate { };
-    
-    [SerializeField] private Button _restartButton;
-
-    private void OnEnable()
+    public class GameWindow : MonoBehaviour
     {
-        _restartButton.onClick.AddListener(OnRestartButtonClicked);
-    }
+        public event Action RestartEvent = delegate { };
 
-    private void OnDisable()
-    {
-        _restartButton.onClick.RemoveListener(OnRestartButtonClicked);
-    }
+        [SerializeField] private Button _restartButton;
 
-    private void OnRestartButtonClicked()
-    {
-        RestartEvent();
+        private void OnEnable()
+        {
+            _restartButton.onClick.AddListener(OnRestartButtonClicked);
+        }
+
+        private void OnDisable()
+        {
+            _restartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+
+        private void OnRestartButtonClicked()
+        {
+            RestartEvent();
+        }
     }
 }

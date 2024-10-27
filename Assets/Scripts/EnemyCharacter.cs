@@ -13,8 +13,9 @@ public class EnemyCharacter : Character
 
     public override void Step()
     {
-        var data = _serviceLocator.GetService<GameSettingsData>();
-        var rndIndex = UnityEngine.Random.Range(0, data.AvailableAbilities.Count);
-        var abilityType = data.AvailableAbilities[rndIndex];
+        var rndIndex = UnityEngine.Random.Range(0, CharacterAbilities.AbilitiesData.Count);
+        var abilityType = CharacterAbilities.AbilitiesData[rndIndex];
+
+        StepCompleteEvent();
     }
 }

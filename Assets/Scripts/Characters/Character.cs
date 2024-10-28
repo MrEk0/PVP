@@ -19,6 +19,14 @@ namespace Characters
             CharacterAbilities = new CharacterAbilities();
         }
 
+        public void Restart()
+        {
+            var data = ServiceLocator.GetService<GameSettingsData>();
+            
+            CharacterAbilities.Restart();
+            Hp.Heal(data.MaxHp);
+        }
+
         public abstract void Step();
     }
 }

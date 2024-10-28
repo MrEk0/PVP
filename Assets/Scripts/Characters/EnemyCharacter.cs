@@ -8,24 +8,20 @@ namespace Characters
     {
         public event Action StepCompleteEvent = delegate { };
 
-        private readonly PlayerCharacter _playerCharacter;
-
-        public EnemyCharacter(ServiceLocator serviceLocator) : base(serviceLocator)
-        {
-            _playerCharacter = serviceLocator.GetService<PlayerCharacter>();
-        }
+        public EnemyCharacter(ServiceLocator serviceLocator) : base(serviceLocator) { }
 
         public override void Step()
         {
             var data = ServiceLocator.GetService<GameSettingsData>();
+            var gameManager = ServiceLocator.GetService<GameManager>();
 
             var rndIndex = UnityEngine.Random.Range(0, CharacterAbilities.AbilitiesData.Count);
             var abilityData = CharacterAbilities.AbilitiesData[rndIndex];
 
             if (data.IsAbilityEnemyApplied(abilityData.Type))
-                CharacterAbilities.Add(this, abilityData.Type);
+                CharacterAbilities.Add(gameManager.PlayerCharacter, abilityData.Type);
             else
-                CharacterAbilities.Add(_playerCharacter, abilityData.Type);
+                CharacterAbilities.Add(this, abilityData.Type);
 
             StepCompleteEvent();
         }

@@ -11,16 +11,47 @@ namespace Common
     {
         [SerializeField] private GameSettingsData _gameSettingsData;
         [SerializeField] private GameWindow _gameWindow;
-
-        private PlayerCharacter _playerCharacter;
-        private EnemyCharacter _enemyCharacter;
+        [SerializeField] private AbilityWindow _abilityWindow;
+        [SerializeField] private CharacterHpView _playerHpView;
+        [SerializeField] private CharacterHpView _enemyHpView;
 
         private bool _isPlayerStep = true;
+        
+        public EnemyCharacter EnemyCharacter { get; private set; }
+        public PlayerCharacter PlayerCharacter { get; private set; }
 
         private void Start()
         {
             var serviceLocator = new ServiceLocator();
+            serviceLocator.AddService(_abilityWindow);
+            serviceLocator.AddService(_gameSettingsData);
+            serviceLocator.AddService(this);
 
+            PlayerCharacter = new PlayerCharacter(serviceLocator);
+            PlayerCharacter.StepCompleteEvent += OnStepCompletedEvent;
+            InitCharacter(PlayerCharacter, _playerHpView);
+
+            EnemyCharacter = new EnemyCharacter(serviceLocator);
+            EnemyCharacter.StepCompleteEvent += OnStepCompletedEvent;
+            InitCharacter(EnemyCharacter, _enemyHpView);
+
+            serviceLocator.AddService(PlayerCharacter);
+            _abilityWindow.Init(serviceLocator);
+            
+            _gameWindow.RestartEvent += OnGameRestarted;
+
+            MakeFirstStep();
+        }
+
+        private void OnDestroy()
+        {
+            PlayerCharacter.StepCompleteEvent -= OnStepCompletedEvent;
+            EnemyCharacter.StepCompleteEvent -= OnStepCompletedEvent;
+            _gameWindow.RestartEvent -= OnGameRestarted;
+        }
+
+        private void InitCharacter(Character character, CharacterHpView hpView)
+        {
             var abilitiesData = _gameSettingsData.AvailableAbilities.Select(ability =>
                 new CharacterAbilities.AbilityData<Ability>
                 {
@@ -31,49 +62,34 @@ namespace Common
                     DurationSteps = ability.DurationSteps,
                     Type = ability.Type
                 }).ToList();
+            
+            character.CharacterAbilities.AddRange(abilitiesData);
+            character.Hp.DeathEvent += OnGameRestarted;
 
-            _playerCharacter = new PlayerCharacter(serviceLocator);
-            _playerCharacter.CharacterAbilities.AddRange(abilitiesData);
-            _playerCharacter.StepCompleteEvent += OnStepCompletedEvent;
-
-            _enemyCharacter = new EnemyCharacter(serviceLocator);
-            _enemyCharacter.CharacterAbilities.AddRange(abilitiesData);
-            _enemyCharacter.StepCompleteEvent += OnStepCompletedEvent;
-
-            _gameWindow.RestartEvent += OnGameRestarted;
-
-            MakeFirstStep();
-        }
-
-        private void OnDestroy()
-        {
-            _playerCharacter.StepCompleteEvent -= OnStepCompletedEvent;
-            _enemyCharacter.StepCompleteEvent -= OnStepCompletedEvent;
-            _gameWindow.RestartEvent -= OnGameRestarted;
+            hpView.Init(character);
         }
 
         private void MakeFirstStep()
         {
-            _playerCharacter.Step();
-            _isPlayerStep = false;
+            PlayerCharacter.Step();
         }
 
         private void OnGameRestarted()
         {
-            _playerCharacter.CharacterAbilities.Restart();
-            _enemyCharacter.CharacterAbilities.Restart();
+            PlayerCharacter.CharacterAbilities.Restart();
+            EnemyCharacter.CharacterAbilities.Restart();
 
             MakeFirstStep();
         }
 
         private void OnStepCompletedEvent()
         {
-            if (_isPlayerStep)
-                _playerCharacter.Step();
-            else
-                _enemyCharacter.Step();
-
             _isPlayerStep = !_isPlayerStep;
+            
+            if (_isPlayerStep)
+                PlayerCharacter.Step();
+            else
+                EnemyCharacter.Step();
         }
     }
 }

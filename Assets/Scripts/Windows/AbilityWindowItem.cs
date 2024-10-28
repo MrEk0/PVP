@@ -24,6 +24,7 @@ namespace Windows
             _type = data.Type;
 
             _blockImage.gameObject.SetActive(data.ReloadSteps > 0);
+            _selectButton.interactable = data.ReloadSteps == 0;
         }
 
         private void OnEnable()

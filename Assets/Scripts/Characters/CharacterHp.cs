@@ -6,10 +6,13 @@ namespace Characters
     public class CharacterHp : IDamagable
     {
         public event Action DeathEvent = delegate { };
+        public event Action UpdateEvent = delegate { };
         
         private float _hp;
         private float _blockDamage;
         private readonly float _maxHp;
+
+        public float GetHpRate => _hp / _maxHp;
 
         public CharacterHp(float maxHp)
         {
@@ -30,13 +33,18 @@ namespace Characters
         public void Heal(float hp)
         {
             _hp = MathF.Min(_hp + hp, _maxHp);
+            
+            UpdateEvent();
         }
 
         public void TakeDamage(float damageValue)
         {
             _blockDamage = MathF.Max(0f, _blockDamage - damageValue);
 
-            _hp -= _blockDamage > 0f ? 0f : damageValue;
+            _hp = MathF.Max(0f, _hp - _blockDamage > 0f ? 0f : damageValue);
+
+            UpdateEvent();
+            
             if (_hp <= 0f)
                 DeathEvent();
         }

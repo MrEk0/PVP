@@ -12,12 +12,10 @@ namespace Characters
         public event Action StepStartEvent = delegate { };
 
         private readonly AbilityWindow _abilityWindow;
-        private readonly EnemyCharacter _enemyCharacter;
 
         public PlayerCharacter(ServiceLocator serviceLocator) : base(serviceLocator)
         {
             _abilityWindow = serviceLocator.GetService<AbilityWindow>();
-            _enemyCharacter = serviceLocator.GetService<EnemyCharacter>();
 
             _abilityWindow.AbilitySelectEvent += OnAbilitySelected;
         }
@@ -25,12 +23,13 @@ namespace Characters
         private void OnAbilitySelected(AbilityTypes type)
         {
             var data = ServiceLocator.GetService<GameSettingsData>();
+            var gameManager = ServiceLocator.GetService<GameManager>();
 
             CharacterAbilities.ChangeSteps();
             CharacterAbilities.SelectAbility(type);
 
             if (data.IsAbilityEnemyApplied(type))
-                CharacterAbilities.Add(_enemyCharacter, type);
+                CharacterAbilities.Add(gameManager.EnemyCharacter, type);
             else
                 CharacterAbilities.Add(this, type);
 

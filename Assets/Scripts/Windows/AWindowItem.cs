@@ -1,8 +1,8 @@
-using Factories;
+using UnityEngine;
 
 namespace Windows
 {
-    public abstract class AWindowItem<T> : AObjectPoolItem where T : AWindowItemData
+    public abstract class AWindowItem<T> : MonoBehaviour where T : AWindowItemData
     {
         public abstract void Init(T data);
     }

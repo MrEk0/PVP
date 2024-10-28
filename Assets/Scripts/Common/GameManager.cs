@@ -76,8 +76,8 @@ namespace Common
 
         private void OnGameRestarted()
         {
-            PlayerCharacter.CharacterAbilities.Restart();
-            EnemyCharacter.CharacterAbilities.Restart();
+            PlayerCharacter.Restart();
+            EnemyCharacter.Restart();
 
             MakeFirstStep();
         }

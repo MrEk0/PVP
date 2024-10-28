@@ -40,8 +40,8 @@ namespace Characters
         public void TakeDamage(float damageValue)
         {
             _blockDamage = MathF.Max(0f, _blockDamage - damageValue);
-
-            _hp = MathF.Max(0f, _hp - _blockDamage > 0f ? 0f : damageValue);
+            
+            _hp = MathF.Max(0f, _blockDamage > 0f ? _hp : _hp - damageValue);
 
             UpdateEvent();
             

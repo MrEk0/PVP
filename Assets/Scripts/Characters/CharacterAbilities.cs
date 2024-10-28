@@ -52,8 +52,7 @@ namespace Characters
                     }
                 }
 
-                abilityData.CurrentReloadSteps =
-                    abilityData.CurrentReloadSteps > 0 ? abilityData.CurrentReloadSteps - 1 : 0;
+                abilityData.CurrentReloadSteps = abilityData.CurrentReloadSteps > 0 ? abilityData.CurrentReloadSteps - 1 : 0;
             }
         }
 
@@ -76,6 +75,8 @@ namespace Characters
 
         public void Restart()
         {
+            foreach (var abilityData in _abilitiesData.Where(abilityData => _applyAbilities.Contains(abilityData.Type)))
+                abilityData.Ability.Remove();
             _applyAbilities.Clear();
 
             foreach (var abilityData in _abilitiesData)

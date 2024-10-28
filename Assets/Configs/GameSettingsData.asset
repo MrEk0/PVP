@@ -33,7 +33,7 @@ MonoBehaviour:
   - _type: 2
     _ownerType: 1
     _sprite: {fileID: 21300000, guid: 7d0b17d89197ae247bfa83ac79725527, type: 3}
-    _reloadSteps: 0
+    _reloadSteps: 5
     _durationSteps: 0
     _damage: 0
     _healAmount: 0

@@ -1,12 +1,17 @@
-
-
 namespace Abilities
 {
     public class DamageAbility : Ability
     {
-        public override void Apply(Character owner)
+        private readonly int _damage; 
+        
+        public DamageAbility(int damage)
         {
-            owner.TakeDamage(8f);
+            _damage = damage;
+        }
+        
+        public override void Apply()
+        {
+            Owner.Hp.TakeDamage(_damage);
         }
     }
 }

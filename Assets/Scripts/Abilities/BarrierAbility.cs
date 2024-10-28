@@ -1,12 +1,22 @@
-
-
 namespace Abilities
 {
     public class BarrierAbility : Ability
     {
-        public override void Apply(Character owner)
+        private readonly int _blockDamage;
+        
+        public BarrierAbility(int blockDamage)
         {
+            _blockDamage = blockDamage;
+        }
+        
+        public override void Apply()
+        {
+            Owner.Hp.SetBlock(_blockDamage);
+        }
 
+        public override void Remove()
+        {
+            Owner.Hp.RemoveBlock();
         }
     }
 }

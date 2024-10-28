@@ -1,7 +1,6 @@
 using System;
-using Windows;
+using Characters;
 using Common;
-using Configs;
 using Enums;
 using Factories;
 using UnityEngine;
